@@ -1,0 +1,21 @@
+{
+  "name": "meatspace-parallax",
+  "version": "0.0.1",
+  "description": "npm template",
+  "main": "main.js",
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": ">= 1.9.0",
+    "should": ">= 1.2.2"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/meatspaces/node-meatspace-parallax.git"
+  },
+  "keywords": [],
+  "author": "Edna Piranha <jen@ednapiranha.com> (http://ednapiranha.com)",
+  "license": "BSD"
+}
