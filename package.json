@@ -1,9 +1,14 @@
 {
   "name": "meatspace-parallax",
   "version": "0.0.1",
-  "description": "npm template",
+  "description": "Decentralized conversations",
   "main": "main.js",
-  "dependencies": {},
+  "dependencies": {
+    "level": ">= 0.10.0",
+    "through": ">= 2.3.4",
+    "level-sublevel": "4.7.1",
+    "leveldown": "*"
+  },
   "devDependencies": {
     "mocha": ">= 1.9.0",
     "should": ">= 1.2.2"
