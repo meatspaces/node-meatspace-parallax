@@ -3,15 +3,18 @@
 process.env.NODE_ENV = 'test';
 
 var should = require('should');
+var child = require('child_process');
 var Parallax = require('../main');
 
 var p = new Parallax('jen@email.com', {
   db: './test/db'
 });
 
+p.flush('./test/db');
+
 describe('parallax', function () {
   after(function () {
-    p.flush('./test/db');
+    child.exec('rm -rf ./test/db');
   });
 
   describe('.getOrAddFriend',  function () {
