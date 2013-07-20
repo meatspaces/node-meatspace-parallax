@@ -5,9 +5,8 @@
   "main": "main.js",
   "dependencies": {
     "level": ">= 0.10.0",
-    "through": ">= 2.3.4",
-    "level-sublevel": "4.7.1",
-    "leveldown": "*"
+    "level-sublevel": ">= 4.8.0",
+    "leveldown": ">= 0.6.1"
   },
   "devDependencies": {
     "mocha": ">= 1.9.0",
