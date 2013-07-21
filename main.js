@@ -63,7 +63,7 @@ var Parallax = function (user, options) {
     switchUser(self.user, self.user);
     var chats = [];
 
-    self.friendLevel.createReadStream()
+    self.friendLevel.createReadStream({ limit: self.limit })
       .on('data', function (data) {
 
       chats.push(data);
