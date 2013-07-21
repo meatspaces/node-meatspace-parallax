@@ -42,7 +42,7 @@ var Parallax = function (user, options) {
   var switchUser = function (fromUser, toUser) {
     self.user = toUser;
     self.friendsLevel = self.db.sublevel(self.user + '!friends');
-    self.friendLevel = self.friendsLevel.sublevel(self.user + '!chats');
+    self.friendLevel = self.friendsLevel.sublevel(toUser + '!chats');
   };
 
   var sendChat = function (user, chat, callback) {
