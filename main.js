@@ -45,6 +45,20 @@ var Parallax = function (user, options) {
     self.friendLevel = self.friendsLevel.sublevel(self.user + '!chats');
   };
 
+  var sendChat = function (user, chat, callback) {
+    var currUser = self.user;
+    switchUser(currUser, user);
+
+    self.friendLevel.put(setTime() + '!' + user, chat, function (err) {
+      if (err) {
+        callback(err);
+      } else {
+        switchUser(currUser, currUser);
+        callback(null, chat);
+      }
+    });
+  };
+
   this.getChats = function (user, callback) {
     switchUser(self.user, self.user);
     var chats = [];
@@ -81,20 +95,6 @@ var Parallax = function (user, options) {
         }
       });
     }
-  };
-
-  var sendChat = function (user, chat, callback) {
-    var currUser = self.user;
-    switchUser(currUser, user);
-
-    self.friendLevel.put(setTime() + '!' + user, chat, function (err) {
-      if (err) {
-        callback(err);
-      } else {
-        switchUser(currUser, currUser);
-        callback(null, chat);
-      }
-    });
   };
 
   this.addChat = function (user, chat, callback) {
