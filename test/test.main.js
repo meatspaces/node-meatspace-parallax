@@ -6,11 +6,11 @@ var should = require('should');
 var child = require('child_process');
 var Parallax = require('../main');
 
-var p = new Parallax('jen@email.com', {
+var p = new Parallax('sender@email.com', {
   db: './test/db'
 });
 
-p.flush('./test/db');
+var p2;
 
 describe('parallax', function () {
   after(function () {
@@ -27,20 +27,20 @@ describe('parallax', function () {
     });
 
     it('should add a new friend', function (done) {
-      p.getOrAddFriend('friend@email.com', function (err, u) {
+      p.getOrAddFriend('receiver@email.com', function (err, u) {
         console.log('new friend: ', u.user);
         should.exist(u);
-        u.user.should.equal('friend@email.com');
+        u.user.should.equal('receiver@email.com');
         u.chats.should.eql([]);
         done();
       });
     });
 
     it('should get an existing friend', function (done) {
-      p.getOrAddFriend('friend@email.com', function (err, u) {
+      p.getOrAddFriend('receiver@email.com', function (err, u) {
         console.log('existing friend: ', u.user);
         should.exist(u);
-        u.user.should.equal('friend@email.com');
+        u.user.should.equal('receiver@email.com');
         u.chats.should.eql([]);
         done();
       });
@@ -49,19 +49,52 @@ describe('parallax', function () {
 
   describe('.addChat', function () {
     it('should add a new chat', function (done) {
-      p.addChat('friend@email.com', 'test message', function (err, c) {
+      p.addChat('receiver@email.com', 'test message', function (err, c) {
         console.log('chat message: ', c);
         should.exist(c);
         c.should.eql('test message');
         done();
       });
     });
+
+    it('should mock a conversation between two users', function (done) {
+      p2 = p;
+
+      p2.user = 'receiver2@email.com';
+      p2.friendsLevel = p2.db.sublevel(p2.user + '!friends');
+
+      p2.getOrAddFriend('sender@email.com', function (err, u) {
+        p2.addChat('sender@email.com', 'hola', function (err, c) {
+          console.log(c);
+
+          p.user = 'sender@email.com';
+          p.friendsLevel = p.db.sublevel(p.user + '!friends');
+
+          setTimeout(function () {
+            p.addChat('receiver2@email.com', 'how are you?', function (err, c) {
+              console.log(c);
+
+              p2.user = 'receiver2@email.com';
+              p2.friendsLevel = p2.db.sublevel(p2.user + '!friends');
+
+              setTimeout(function () {
+                p2.addChat('sender@email.com', 'muy bien, gracias!', function (err, c) {
+                  console.log(c);
+                  done();
+                });
+              }, 1000);
+            });
+          }, 1000);
+        });
+      });
+    });
+
   });
 
   describe('.getChats', function () {
-    it('should get chats', function (done) {
-      p.getChats('friend@email.com', function (err, c) {
-        console.log('chats received: ', c);
+    it('should get chats to sender', function (done) {
+      p2.getChats('sender@email.com', function (err, c) {
+        console.log('chats received: ', c.chats);
         should.exist(c);
         done();
       });

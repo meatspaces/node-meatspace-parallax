@@ -22,9 +22,12 @@ var Parallax = function (user, options) {
     valueEncoding: 'json'
   }));
   this.friendsLevel = this.db.sublevel(this.user + '!friends');
+  this.friendLevel;
 
   var addFriend = function (user, callback) {
-    self.friendsLevel.put(user + '!chats', [], function (err) {
+    self.friendLevel = self.friendsLevel.sublevel(user);
+
+    self.friendLevel.put('chats', true, function (err) {
       if (err) {
         callback(err);
       } else {
@@ -36,39 +39,11 @@ var Parallax = function (user, options) {
     });
   };
 
-  this.getOrAddFriend = function (user, callback) {
-    if (user.replace(/\s+/gi, '').length < 1) {
-      callback(new Error('Invalid user id'));
-    } else {
-      self.friendsLevel.get(user + '!chats', function (err, chats) {
-        if (err || !chats) {
-          addFriend(user, callback);
-        } else {
-          callback(null, {
-            user: user,
-            chats: chats
-          });
-        }
-      });
-    }
-  };
-
-  this.addChat = function (user, chat, callback) {
-    var friendChatLevel = self.friendsLevel.sublevel('chats');
-    friendChatLevel.put(setTime(), chat, function (err) {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, chat);
-      }
-    });
-  };
-
   this.getChats = function (user, callback) {
-    var friendChatLevel = self.friendsLevel.sublevel('chats');
+    self.friendLevel = self.friendsLevel.sublevel(user + '!chats');
     var chats = [];
 
-    friendChatLevel.createReadStream()
+    self.friendLevel.createReadStream()
       .on('data', function (data) {
 
       chats.push(data);
@@ -77,13 +52,59 @@ var Parallax = function (user, options) {
       callback(err);
     }).on('end', function () {
 
-      callback(null, chats);
+      callback(null, {
+        user: user,
+        chats: chats
+      });
     });
   };
 
-  this.flush = function (dbPath) {
-    level.destroy(dbPath || self.dbPath, function (err) {
-      console.log('Deleted database');
+  this.getOrAddFriend = function (user, callback) {
+    user = user.replace(/\s+/gi, '');
+
+    if (user.length < 1) {
+      callback(new Error('Invalid user id'));
+    } else {
+      self.friendLevel = self.friendsLevel.sublevel(user);
+
+      self.friendLevel.get('chats', function (err, chats) {
+        if (err || !chats) {
+          addFriend(user, callback);
+        } else {
+          self.getChats(user, callback);
+        }
+      });
+    }
+  };
+
+  this.sendChat = function (user, chat, callback) {
+    if (user === self.user) {
+      callback(new Error("You can't send a chat to yourself"));
+    } else {
+      var currUser = self.user;
+      self.user = user;
+      self.friendLevel = self.friendsLevel.sublevel(user + '!chats');
+
+      self.friendLevel.put(currUser + '!' + setTime(), chat, function (err) {
+        if (err) {
+          callback(err);
+        } else {
+          self.user = currUser;
+          callback(null, chat);
+        }
+      });
+    }
+  };
+
+  this.addChat = function (user, chat, callback) {
+    self.friendLevel = self.friendsLevel.sublevel(user + '!chats');
+
+    self.friendLevel.put(user + '!' + setTime(), chat, function (err) {
+      if (err) {
+        callback(err);
+      } else {
+        self.sendChat(user, chat, callback);
+      }
     });
   };
 };
