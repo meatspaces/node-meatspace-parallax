@@ -88,7 +88,6 @@ describe('parallax', function () {
         });
       });
     });
-
   });
 
   describe('.getChats', function () {
