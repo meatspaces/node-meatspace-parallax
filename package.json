@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git://github.com/meatspaces/node-meatspace-parallax.git"
   },
-  "keywords": [],
+  "keywords": ["leveldb", "chat"],
   "author": "Edna Piranha <jen@ednapiranha.com> (http://ednapiranha.com)",
   "license": "BSD"
 }
