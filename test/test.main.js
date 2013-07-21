@@ -94,8 +94,19 @@ describe('parallax', function () {
   describe('.getChats', function () {
     it('should get chats to sender', function (done) {
       p2.getChats('sender@email.com', function (err, c) {
-        console.log('chats received: ', c.chats);
         should.exist(c);
+        c.chats.length.should.equal(3);
+        done();
+      });
+    });
+
+    it('should get chats to receiver2', function (done) {
+      p.user = 'sender@email.com';
+      p.friendsLevel = p.db.sublevel(p.user + '!friends');
+
+      p.getChats('receiver2@email.com', function (err, c) {
+        should.exist(c);
+        c.chats.length.should.equal(4);
         done();
       });
     });

@@ -39,8 +39,14 @@ var Parallax = function (user, options) {
     });
   };
 
+  var switchUser = function (fromUser, toUser) {
+    self.user = toUser;
+    self.friendsLevel = self.db.sublevel(self.user + '!friends');
+    self.friendLevel = self.friendsLevel.sublevel(self.user + '!chats');
+  };
+
   this.getChats = function (user, callback) {
-    self.friendLevel = self.friendsLevel.sublevel(user + '!chats');
+    switchUser(self.user, self.user);
     var chats = [];
 
     self.friendLevel.createReadStream()
@@ -65,7 +71,7 @@ var Parallax = function (user, options) {
     if (user.length < 1) {
       callback(new Error('Invalid user id'));
     } else {
-      self.friendLevel = self.friendsLevel.sublevel(user);
+      switchUser(self.user, self.user);
 
       self.friendLevel.get('chats', function (err, chats) {
         if (err || !chats) {
@@ -77,33 +83,28 @@ var Parallax = function (user, options) {
     }
   };
 
-  this.sendChat = function (user, chat, callback) {
-    if (user === self.user) {
-      callback(new Error("You can't send a chat to yourself"));
-    } else {
-      var currUser = self.user;
-      self.user = user;
-      self.friendLevel = self.friendsLevel.sublevel(user + '!chats');
+  var sendChat = function (user, chat, callback) {
+    var currUser = self.user;
+    switchUser(currUser, user);
 
-      self.friendLevel.put(currUser + '!' + setTime(), chat, function (err) {
-        if (err) {
-          callback(err);
-        } else {
-          self.user = currUser;
-          callback(null, chat);
-        }
-      });
-    }
-  };
-
-  this.addChat = function (user, chat, callback) {
-    self.friendLevel = self.friendsLevel.sublevel(user + '!chats');
-
-    self.friendLevel.put(user + '!' + setTime(), chat, function (err) {
+    self.friendLevel.put(setTime() + '!' + user, chat, function (err) {
       if (err) {
         callback(err);
       } else {
-        self.sendChat(user, chat, callback);
+        switchUser(currUser, currUser);
+        callback(null, chat);
+      }
+    });
+  };
+
+  this.addChat = function (user, chat, callback) {
+    switchUser(self.user, self.user);
+
+    self.friendLevel.put(setTime() + '!' + user, chat, function (err) {
+      if (err) {
+        callback(err);
+      } else {
+        sendChat(user, chat, callback);
       }
     });
   };
