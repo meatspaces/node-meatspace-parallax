@@ -82,9 +82,9 @@ describe('parallax', function () {
                   console.log(c);
                   done();
                 });
-              }, 1000);
+              }, 1);
             });
-          }, 1000);
+          }, 1);
         });
       });
     });
@@ -106,6 +106,7 @@ describe('parallax', function () {
       p.getChats('receiver2@email.com', function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(4);
+        console.log('full chat ', c.chats)
         done();
       });
     });

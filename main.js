@@ -7,7 +7,7 @@ var Parallax = function (user, options) {
   var self = this;
 
   var setTime = function () {
-    return Math.floor(new Date() / 1000);
+    return Date.now();
   };
 
   if (!options) {
