@@ -95,6 +95,7 @@ describe('parallax', function () {
       p2.getChats('sender@email.com', function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(3);
+        console.log('full chat ', c.chats)
         done();
       });
     });
