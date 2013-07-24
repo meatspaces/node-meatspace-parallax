@@ -14,8 +14,6 @@ Chat using LevelDB. Currently under development.
 
 ## Installation
 
-[Install leveldb](http://code.google.com/p/leveldb/downloads/list)
-
     > npm install
 
 ## Usage
