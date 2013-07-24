@@ -95,7 +95,7 @@ describe('parallax', function () {
       p2.user = 'receiver2@email.com';
       p2.friendsLevel = p2.db.sublevel('sender@email.com!friends');
 
-      p2.getChats('sender@email.com', function (err, c) {
+      p2.getChats('sender@email.com', false, false, function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(3);
         console.log('full chat of receiver2/sender ', c.chats)
@@ -107,7 +107,7 @@ describe('parallax', function () {
       p.user = 'sender@email.com';
       p.friendsLevel = p.db.sublevel('receiver2@email.com!friends');
 
-      p.getChats('receiver2@email.com', function (err, c) {
+      p.getChats('receiver2@email.com', false, false, function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(3);
         console.log('full chat of sender/receiver2 ', c.chats)
@@ -115,10 +115,20 @@ describe('parallax', function () {
       });
     });
 
+    it('should get chats to receiver2 from sender since key in reverse', function (done) {
+      p.limit = 2;
+      p.getChats('receiver2@email.com', false, false, function (err, c) {
+        p.getChats('receiver2@email.com', c.chats[c.chats.length - 1].key, true, function (err, c) {
+          c.chats.length.should.equal(2);
+          done();
+        });
+      });
+    });
+
     it('should get chats to receiver from sender', function (done) {
       p.friendsLevel = p.db.sublevel('receiver@email.com!friends');
 
-      p.getChats('receiver@email.com', function (err, c) {
+      p.getChats('receiver@email.com', false, false, function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(1);
         console.log('full chat of sender/receiver ', c.chats)
@@ -130,7 +140,7 @@ describe('parallax', function () {
       p2.user = 'receiver@email.com';
       p2.friendsLevel = p2.db.sublevel('receiver@email.com!friends');
 
-      p2.getChats('sender@email.com', function (err, c) {
+      p2.getChats('sender@email.com', false, false, function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(1);
         console.log('full chat of reciever/sender ', c.chats)

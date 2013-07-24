@@ -40,11 +40,15 @@ Chat using LevelDB. Currently under development.
 
 ### Get all chats
 
-    parallax.getChats('you@email.com', function (err, c) {
+    parallax.getChats('you@email.com', <key>, <reverse>, function (err, c) {
       if (!err) {
         console.log(c);
       }
     });
+
+`key` is an optional point in which you want to start a chat stream from - set to false if you want it to default to the beginning.
+
+`reverse` is an optional boolean to reverse the chat history from latest -> earliest. Defaults at earliest -> latest.
 
 ## Tests
 

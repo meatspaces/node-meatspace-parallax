@@ -58,12 +58,16 @@ var Parallax = function (user, options) {
     });
   };
 
-  this.getChats = function (user, callback) {
+  this.getChats = function (user, key, reverse, callback) {
     switchUser(self.user, user);
     var chats = [];
 
-    self.friendLevel.createReadStream({ limit: self.limit })
-      .on('data', function (data) {
+    self.friendLevel.createReadStream({
+      key: key,
+      limit: self.limit,
+      reverse: reverse
+
+    }).on('data', function (data) {
 
       chats.push(data);
     }).on('error', function (err) {
