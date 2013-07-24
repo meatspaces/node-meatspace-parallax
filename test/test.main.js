@@ -82,32 +82,58 @@ describe('parallax', function () {
                   console.log(c);
                   done();
                 });
-              }, 1);
+              }, 300);
             });
-          }, 1);
+          }, 300);
         });
       });
     });
   });
 
   describe('.getChats', function () {
-    it('should get chats to sender', function (done) {
+    it('should get chats to sender from receiver2', function (done) {
+      p2.user = 'receiver2@email.com';
+      p2.friendsLevel = p2.db.sublevel('sender@email.com!friends');
+
       p2.getChats('sender@email.com', function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(3);
-        console.log('full chat ', c.chats)
+        console.log('full chat of receiver2/sender ', c.chats)
         done();
       });
     });
 
-    it('should get chats to receiver2', function (done) {
+    it('should get chats to receiver2 from sender', function (done) {
       p.user = 'sender@email.com';
-      p.friendsLevel = p.db.sublevel(p.user + '!friends');
+      p.friendsLevel = p.db.sublevel('receiver2@email.com!friends');
 
       p.getChats('receiver2@email.com', function (err, c) {
         should.exist(c);
-        c.chats.length.should.equal(4);
-        console.log('full chat ', c.chats)
+        c.chats.length.should.equal(3);
+        console.log('full chat of sender/receiver2 ', c.chats)
+        done();
+      });
+    });
+
+    it('should get chats to receiver from sender', function (done) {
+      p.friendsLevel = p.db.sublevel('receiver@email.com!friends');
+
+      p.getChats('receiver@email.com', function (err, c) {
+        should.exist(c);
+        c.chats.length.should.equal(1);
+        console.log('full chat of sender/receiver ', c.chats)
+        done();
+      });
+    });
+
+    it('should get chats to sender from receiver', function (done) {
+      p2.user = 'receiver@email.com';
+      p2.friendsLevel = p2.db.sublevel('receiver@email.com!friends');
+
+      p2.getChats('sender@email.com', function (err, c) {
+        should.exist(c);
+        c.chats.length.should.equal(1);
+        console.log('full chat of reciever/sender ', c.chats)
         done();
       });
     });

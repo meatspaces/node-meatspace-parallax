@@ -40,27 +40,26 @@ var Parallax = function (user, options) {
   };
 
   var switchUser = function (fromUser, toUser) {
-    self.user = toUser;
+    self.user = fromUser;
     self.friendsLevel = self.db.sublevel(self.user + '!friends');
     self.friendLevel = self.friendsLevel.sublevel(toUser + '!chats');
   };
 
   var sendChat = function (user, chat, callback) {
-    var currUser = self.user;
-    switchUser(currUser, user);
+    switchUser(user, self.user);
 
-    self.friendLevel.put(setTime() + '!' + user, chat, function (err) {
+    self.friendLevel.put(setTime() + '!' + self.user, chat, function (err) {
       if (err) {
         callback(err);
       } else {
-        switchUser(currUser, currUser);
+        self.user = self.currUser;
         callback(null, chat);
       }
     });
   };
 
   this.getChats = function (user, callback) {
-    switchUser(self.user, self.user);
+    switchUser(self.user, user);
     var chats = [];
 
     self.friendLevel.createReadStream({ limit: self.limit })
@@ -98,7 +97,8 @@ var Parallax = function (user, options) {
   };
 
   this.addChat = function (user, chat, callback) {
-    switchUser(self.user, self.user);
+    self.currUser = self.user;
+    switchUser(self.currUser, user);
 
     self.friendLevel.put(setTime() + '!' + user, chat, function (err) {
       if (err) {
