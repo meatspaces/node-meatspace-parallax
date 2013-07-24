@@ -83,7 +83,7 @@ var Parallax = function (user, options) {
   };
 
   this.getOrAddFriend = function (user, callback) {
-    user = user.replace(/\s+/gi, '');
+    user = user.toString().replace(/\s+/gi, '');
 
     if (user.length < 1) {
       callback(new Error('Invalid user id'));
