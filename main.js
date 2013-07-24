@@ -83,6 +83,10 @@ var Parallax = function (user, options) {
   };
 
   this.getOrAddFriend = function (user, callback) {
+    if (!user) {
+      user = '';
+    }
+
     user = user.toString().replace(/\s+/gi, '');
 
     if (user.length < 1) {
