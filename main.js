@@ -22,18 +22,25 @@ var Parallax = function (user, options) {
     valueEncoding: 'json'
   }));
   this.friendsLevel = this.db.sublevel(this.user + '!friends');
+  this.friendList = this.db.sublevel(this.user + '!friendlist');
   this.friendLevel;
 
   var addFriend = function (user, callback) {
     self.friendLevel = self.friendsLevel.sublevel(user);
 
-    self.friendLevel.put('chats', true, function (err) {
+    self.friendList.put(user, true, function (err) {
       if (err) {
         callback(err);
       } else {
-        callback(null, {
-          user: user,
-          chats: []
+        self.friendLevel.put('chats', true, function (err) {
+          if (err) {
+            callback(err);
+          } else {
+            callback(null, {
+              user: user,
+              chats: []
+            });
+          }
         });
       }
     });
@@ -42,19 +49,44 @@ var Parallax = function (user, options) {
   var switchUser = function (fromUser, toUser) {
     self.user = fromUser;
     self.friendsLevel = self.db.sublevel(self.user + '!friends');
+    self.friendList = self.db.sublevel(self.user + '!friendlist');
     self.friendLevel = self.friendsLevel.sublevel(toUser + '!chats');
   };
 
   var sendChat = function (user, chat, callback) {
     switchUser(user, self.user);
 
-    self.friendLevel.put(setTime() + '!' + self.user, chat, function (err) {
+    self.friendList.put(user, true, function (err) {
       if (err) {
         callback(err);
       } else {
-        self.user = self.currUser;
-        callback(null, chat);
+        self.friendLevel.put(setTime() + '!' + self.user, chat, function (err) {
+          if (err) {
+            callback(err);
+          } else {
+            self.user = self.currUser;
+            callback(null, chat);
+          }
+        });
       }
+    });
+  };
+
+  this.getFriends = function (callback) {
+    var friends = [];
+
+    self.friendList.createReadStream()
+      .on('data', function (data) {
+
+      friends.push(data);
+    }).on('error', function (err) {
+
+      callback(err);
+    }).on('end', function () {
+
+      callback(null, {
+        friends: friends
+      });
     });
   };
 

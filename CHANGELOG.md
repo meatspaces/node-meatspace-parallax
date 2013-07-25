@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4
+
+* Added friend list call
+
 ## 0.0.3
 
 * Added key and reverse options for chat

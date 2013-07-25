@@ -62,6 +62,7 @@ describe('parallax', function () {
 
       p2.user = 'receiver2@email.com';
       p2.friendsLevel = p2.db.sublevel(p2.user + '!friends');
+      p2.friendList = p2.db.sublevel(p2.user + '!friendlist');
 
       p2.getOrAddFriend('sender@email.com', function (err, u) {
         p2.addChat('sender@email.com', 'hola', function (err, c) {
@@ -69,6 +70,7 @@ describe('parallax', function () {
 
           p.user = 'sender@email.com';
           p.friendsLevel = p.db.sublevel(p.user + '!friends');
+          p.friendList = p.db.sublevel(p.user + '!friendlist');
 
           setTimeout(function () {
             p.addChat('receiver2@email.com', 'how are you?', function (err, c) {
@@ -90,10 +92,20 @@ describe('parallax', function () {
     });
   });
 
+  describe('.getFriends', function () {
+    it('should get existing friends', function (done) {
+      p.getFriends(function (err, f) {
+        f.friends.length.should.equal(2);
+        done();
+      });
+    });
+  });
+
   describe('.getChats', function () {
     it('should get chats to sender from receiver2', function (done) {
       p2.user = 'receiver2@email.com';
       p2.friendsLevel = p2.db.sublevel('sender@email.com!friends');
+      p2.friendList = p2.db.sublevel('sender@email.com!friendlist');
 
       p2.getChats('sender@email.com', false, false, function (err, c) {
         should.exist(c);
@@ -106,6 +118,7 @@ describe('parallax', function () {
     it('should get chats to receiver2 from sender', function (done) {
       p.user = 'sender@email.com';
       p.friendsLevel = p.db.sublevel('receiver2@email.com!friends');
+      p.friendList = p.db.sublevel('receiver@email.com!friendlist');
 
       p.getChats('receiver2@email.com', false, false, function (err, c) {
         should.exist(c);
@@ -127,6 +140,7 @@ describe('parallax', function () {
 
     it('should get chats to receiver from sender', function (done) {
       p.friendsLevel = p.db.sublevel('receiver@email.com!friends');
+      p.friendList = p.db.sublevel('receiver@email.com!friendlist');
 
       p.getChats('receiver@email.com', false, false, function (err, c) {
         should.exist(c);
@@ -139,6 +153,7 @@ describe('parallax', function () {
     it('should get chats to sender from receiver', function (done) {
       p2.user = 'receiver@email.com';
       p2.friendsLevel = p2.db.sublevel('receiver@email.com!friends');
+      p2.friendList = p2.db.sublevel('receiver@email.com!friendlist');
 
       p2.getChats('sender@email.com', false, false, function (err, c) {
         should.exist(c);
