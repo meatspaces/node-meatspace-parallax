@@ -28,6 +28,14 @@ Chat using LevelDB. Currently under development.
       }
     });
 
+## Get all friends
+
+    parallax.getFriends(function (err, f) {
+      if (!err) {
+        console.log(f);
+      }
+    });
+
 ### Add a chat message
 
     parallax.addChat('friend@email.com', 'hola!', function (err, c) {
