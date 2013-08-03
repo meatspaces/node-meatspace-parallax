@@ -44,7 +44,7 @@ Chat using LevelDB. Currently under development.
       }
     });
 
-If you do not want to set a ttl, just pass {} or { ttl: false }
+If you do not set a ttl (e.g. passing {} or { ttl: false }), it will fall back to 10 seconds
 
 ### Get all chats
 

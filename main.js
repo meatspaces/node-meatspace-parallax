@@ -7,6 +7,8 @@ var Sublevel = require('level-sublevel');
 var Parallax = function (user, options) {
   var self = this;
 
+  var DEFAULT_TTL = 10000; // 10 seconds
+
   var setTime = function () {
     return Date.now();
   };
@@ -62,13 +64,13 @@ var Parallax = function (user, options) {
       if (err) {
         callback(err);
       } else {
-        var ttl = false;
+        var ttl = DEFAULT_TTL;
 
         if (options.ttl) {
           ttl = parseInt(options.ttl, 10);
 
           if (isNaN(ttl)) {
-            ttl = false;
+            ttl = DEFAULT_TTL;
           }
         }
 
@@ -79,7 +81,6 @@ var Parallax = function (user, options) {
             callback(err);
           } else {
             self.user = self.currUser;
-            console.log('******************* ', chat)
             callback(null, chat);
           }
         });
@@ -155,7 +156,7 @@ var Parallax = function (user, options) {
     self.currUser = self.user;
     switchUser(self.currUser, user);
 
-    var ttl = false;
+    var ttl = DEFAULT_TTL;
 
     if (!options) {
       options = {};
@@ -165,7 +166,7 @@ var Parallax = function (user, options) {
       ttl = parseInt(options.ttl, 10);
 
       if (isNaN(ttl)) {
-        ttl = false;
+        ttl = DEFAULT_TTL;
       }
     }
 
