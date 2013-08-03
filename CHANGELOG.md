@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5
+
+* Ephemeral messaging support with level-ttl
+
 ## 0.0.4
 
 * Added friend list call
