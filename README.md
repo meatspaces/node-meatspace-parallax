@@ -38,11 +38,13 @@ Chat using LevelDB. Currently under development.
 
 ### Add a chat message
 
-    parallax.addChat('friend@email.com', 'hola!', function (err, c) {
+    parallax.addChat('friend@email.com', 'hola!', { ttl: 10000 }, function (err, c) {
       if (!err) {
         console.log(c);
       }
     });
+
+If you do not want to set a ttl, just pass {} or { ttl: false }
 
 ### Get all chats
 
