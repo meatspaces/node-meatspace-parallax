@@ -7,7 +7,8 @@ var child = require('child_process');
 var Parallax = require('../main');
 
 var p = new Parallax('sender@email.com', {
-  db: './test/db'
+  db: './test/db',
+  frequency: 10
 });
 
 var p2;
@@ -49,11 +50,28 @@ describe('parallax', function () {
 
   describe('.addChat', function () {
     it('should add a new chat', function (done) {
-      p.addChat('receiver@email.com', 'test message', function (err, c) {
+      p.addChat('receiver@email.com', 'test message', false, function (err, c) {
         console.log('chat message: ', c);
         should.exist(c);
         c.should.eql('test message');
-        done();
+
+        p.getChats('receiver@email.com', false, false, function (err, c) {
+          c.chats.length.should.equal(1);
+          done();
+        });
+      });
+    });
+
+    it('should add a new chat that is destroyed after 1 second', function (done) {
+      p.addChat('receiver@email.com', 'test message with ttl', { ttl: 1000 }, function (err, c) {
+        console.log('chat message: ', c);
+        setTimeout(function () {
+          p.getChats('receiver@email.com', false, false, function (err, c) {
+            console.log(c.chats)
+            c.chats.length.should.equal(1);
+            done();
+          });
+        }, 2200);
       });
     });
 
@@ -65,7 +83,7 @@ describe('parallax', function () {
       p2.friendList = p2.db.sublevel(p2.user + '!friendlist');
 
       p2.getOrAddFriend('sender@email.com', function (err, u) {
-        p2.addChat('sender@email.com', 'hola', function (err, c) {
+        p2.addChat('sender@email.com', 'hola', false, function (err, c) {
           console.log(c);
 
           p.user = 'sender@email.com';
@@ -73,14 +91,14 @@ describe('parallax', function () {
           p.friendList = p.db.sublevel(p.user + '!friendlist');
 
           setTimeout(function () {
-            p.addChat('receiver2@email.com', 'how are you?', function (err, c) {
+            p.addChat('receiver2@email.com', 'how are you?', false, function (err, c) {
               console.log(c);
 
               p2.user = 'receiver2@email.com';
               p2.friendsLevel = p2.db.sublevel(p2.user + '!friends');
 
               setTimeout(function () {
-                p2.addChat('sender@email.com', 'muy bien, gracias!', function (err, c) {
+                p2.addChat('sender@email.com', 'muy bien, gracias!', false, function (err, c) {
                   console.log(c);
                   done();
                 });

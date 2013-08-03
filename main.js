@@ -1,6 +1,7 @@
 'use strict';
 
 var level = require('level');
+var ttl = require('level-ttl');
 var Sublevel = require('level-sublevel');
 
 var Parallax = function (user, options) {
@@ -22,6 +23,7 @@ var Parallax = function (user, options) {
     valueEncoding: 'json'
   }));
   this.friendsLevel = this.db.sublevel(this.user + '!friends');
+  this.db = ttl(this.db, { checkFrequency: options.frequency || 10000 });
   this.friendList = this.db.sublevel(this.user + '!friendlist');
   this.friendLevel;
 
@@ -53,18 +55,31 @@ var Parallax = function (user, options) {
     self.friendLevel = self.friendsLevel.sublevel(toUser + '!chats');
   };
 
-  var sendChat = function (user, chat, callback) {
+  var sendChat = function (user, chat, options, callback) {
     switchUser(user, self.user);
 
     self.friendList.put(user, true, function (err) {
       if (err) {
         callback(err);
       } else {
-        self.friendLevel.put(setTime() + '!' + self.user, chat, function (err) {
+        var ttl = false;
+
+        if (options.ttl) {
+          ttl = parseInt(options.ttl, 10);
+
+          if (isNaN(ttl)) {
+            ttl = false;
+          }
+        }
+
+        self.friendLevel.put(setTime() + '!' + self.user,
+                             { message: chat, ttl: ttl },
+                             { ttl: ttl }, function (err) {
           if (err) {
             callback(err);
           } else {
             self.user = self.currUser;
+            console.log('******************* ', chat)
             callback(null, chat);
           }
         });
@@ -136,15 +151,31 @@ var Parallax = function (user, options) {
     }
   };
 
-  this.addChat = function (user, chat, callback) {
+  this.addChat = function (user, chat, options, callback) {
     self.currUser = self.user;
     switchUser(self.currUser, user);
 
-    self.friendLevel.put(setTime() + '!' + user, chat, function (err) {
+    var ttl = false;
+
+    if (!options) {
+      options = {};
+    }
+
+    if (options.ttl) {
+      ttl = parseInt(options.ttl, 10);
+
+      if (isNaN(ttl)) {
+        ttl = false;
+      }
+    }
+
+    self.friendLevel.put(setTime() + '!' + user,
+                         { message: chat, ttl: ttl },
+                         { ttl: ttl }, function (err) {
       if (err) {
         callback(err);
       } else {
-        sendChat(user, chat, callback);
+        sendChat(user, chat, options, callback);
       }
     });
   };
