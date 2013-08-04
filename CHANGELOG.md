@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.7
+
+* Trigger TTL only after item has been opened
+* Default opened 'sent' message to 3 days
+
+## 0.0.6
+
+* Delete messages only after they have been read
+
 ## 0.0.5
 
 * Ephemeral messaging support with level-ttl

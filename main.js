@@ -8,6 +8,7 @@ var Parallax = function (user, options) {
   var self = this;
 
   var DEFAULT_TTL = 10000; // 10 seconds
+  var CHAT_TTL_LONG = 259200000; // 3 days
 
   var setTime = function () {
     return Date.now();
@@ -28,6 +29,7 @@ var Parallax = function (user, options) {
   this.db = ttl(this.db, { checkFrequency: options.frequency || 10000 });
   this.friendList = this.db.sublevel(this.user + '!friendlist');
   this.friendLevel;
+  this.currUser = this.user;
 
   var addFriend = function (user, callback) {
     self.friendLevel = self.friendsLevel.sublevel(user);
@@ -57,10 +59,10 @@ var Parallax = function (user, options) {
     self.friendLevel = self.friendsLevel.sublevel(toUser + '!chats');
   };
 
-  var sendChat = function (user, chat, options, callback) {
+  var sendChat = function (user, chat, senderKey, options, callback) {
     switchUser(user, self.user);
 
-    self.friendList.put(user, true, function (err) {
+    self.friendList.put(self.currUser, true, function (err) {
       if (err) {
         callback(err);
       } else {
@@ -74,14 +76,52 @@ var Parallax = function (user, options) {
           }
         }
 
-        self.friendLevel.put(setTime() + '!' + self.user,
-                             { message: chat, ttl: ttl },
-                             { ttl: ttl }, function (err) {
+        var key = setTime() + '!' + self.user;
+
+        self.friendLevel.put(key, { message: chat, ttl: ttl, senderKey: key },
+                             function (err) {
           if (err) {
             callback(err);
           } else {
             self.user = self.currUser;
-            callback(null, chat);
+
+            callback(null, {
+              message: chat,
+              ttl: ttl,
+              key: key,
+              senderKey: senderKey
+            });
+          }
+        });
+      }
+    });
+  };
+
+  this.getChat = function (key, user, callback) {
+    switchUser(user, self.user);
+
+    self.friendLevel.get(key, function (err, chat) {
+      if (err || !chat) {
+        callback(new Error('Chat not found'));
+      } else {
+        self.friendLevel.put(key, chat, { ttl: chat.ttl }, function (err) {
+          if (err) {
+            callback(err);
+          } else {
+            switchUser(self.currUser, user);
+
+            self.friendLevel.put(key,
+                                 { message: 'opened', ttl: CHAT_TTL_LONG, senderKey: chat.senderKey },
+                                 { ttl: CHAT_TTL_LONG },
+                                 function (err) {
+              if (err) {
+                callback(err);
+              } else {
+                self.user = self.currUser;
+
+                callback(null, chat);
+              }
+            });
           }
         });
       }
@@ -170,13 +210,15 @@ var Parallax = function (user, options) {
       }
     }
 
-    self.friendLevel.put(setTime() + '!' + user,
-                         { message: chat, ttl: ttl },
-                         { ttl: ttl }, function (err) {
+    var senderKey = setTime() + '!' + user;
+
+    self.friendLevel.put(senderKey,
+                         { message: chat, ttl: ttl, senderKey: senderKey },
+                         function (err) {
       if (err) {
         callback(err);
       } else {
-        sendChat(user, chat, options, callback);
+        sendChat(user, chat, senderKey, options, callback);
       }
     });
   };

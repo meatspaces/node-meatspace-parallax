@@ -46,6 +46,16 @@ Chat using LevelDB. Currently under development.
 
 If you do not set a ttl (e.g. passing {} or { ttl: false }), it will fall back to 10 seconds
 
+### Get chat
+
+    parallax.getChat(<key>, 'friend@email.com', function (err, c) {
+      if (!err) {
+        console.log(c);
+      }
+    });
+
+Once the chat has been opened by the receiver, the TTL will start. An archive of the 'sent' message will be in the sender's chat but will delete in 3 days.
+
 ### Get all chats
 
     parallax.getChats('you@email.com', <key>, <reverse>, function (err, c) {

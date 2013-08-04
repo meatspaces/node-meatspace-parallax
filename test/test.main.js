@@ -8,7 +8,7 @@ var Parallax = require('../main');
 
 var p = new Parallax('sender@email.com', {
   db: './test/db',
-  frequency: 10
+  frequency: 1
 });
 
 var p2;
@@ -29,7 +29,7 @@ describe('parallax', function () {
 
     it('should add a new friend', function (done) {
       p.getOrAddFriend('receiver@email.com', function (err, u) {
-        console.log('new friend: ', u.user);
+        //console.log('new friend: ', u.user);
         should.exist(u);
         u.user.should.equal('receiver@email.com');
         u.chats.should.eql([]);
@@ -39,7 +39,7 @@ describe('parallax', function () {
 
     it('should get an existing friend', function (done) {
       p.getOrAddFriend('receiver@email.com', function (err, u) {
-        console.log('existing friend: ', u.user);
+        //console.log('existing friend: ', u.user);
         should.exist(u);
         u.user.should.equal('receiver@email.com');
         u.chats.should.eql([]);
@@ -53,7 +53,7 @@ describe('parallax', function () {
       p.addChat('receiver@email.com', 'test message', false, function (err, c) {
         console.log('chat message: ', c);
         should.exist(c);
-        c.should.eql('test message');
+        c.message.should.eql('test message');
 
         p.getChats('receiver@email.com', false, false, function (err, c) {
           c.chats.length.should.equal(1);
@@ -62,30 +62,30 @@ describe('parallax', function () {
       });
     });
 
-    it('should add a new chat that is destroyed after 1 second', function (done) {
-      p.addChat('receiver@email.com', 'test message with ttl', { ttl: 1000 }, function (err, c) {
-        console.log('chat message: ', c);
-        setTimeout(function () {
-          p.getChats('receiver@email.com', false, false, function (err, c) {
-            console.log(c.chats)
-            c.chats.length.should.equal(1);
-            done();
-          });
-        }, 2200);
-      });
-    });
-
-    it('should mock a conversation between two users', function (done) {
+    it('should add a new chat that is destroyed after 1 second from retrieval', function (done) {
       p2 = p;
 
       p2.user = 'receiver2@email.com';
       p2.friendsLevel = p2.db.sublevel(p2.user + '!friends');
       p2.friendList = p2.db.sublevel(p2.user + '!friendlist');
 
+      p2.addChat('sender@email.com', 'test message with ttl', { ttl: 1000 }, function (err, c) {
+        p.getChat(c.key, 'receiver2@email.com', function (err, c1) {
+          setTimeout(function () {
+            p2.getChat(c.key, 'sender@email.com', function (err, c2) {
+              should.not.exist(c1);
+              should.exist(c2);
+              done();
+            });
+          }, 2500);
+        });
+      });
+    });
+
+    it('should mock a conversation between two users', function (done) {
       p2.getOrAddFriend('sender@email.com', function (err, u) {
         p2.addChat('sender@email.com', 'hola', false, function (err, c) {
           console.log(c);
-
           p.user = 'sender@email.com';
           p.friendsLevel = p.db.sublevel(p.user + '!friends');
           p.friendList = p.db.sublevel(p.user + '!friendlist');
@@ -127,8 +127,8 @@ describe('parallax', function () {
 
       p2.getChats('sender@email.com', false, false, function (err, c) {
         should.exist(c);
-        c.chats.length.should.equal(3);
-        console.log('full chat of receiver2/sender ', c.chats)
+        c.chats.length.should.equal(4);
+        console.log('full chat of receiver2 -> sender ', c.chats)
         done();
       });
     });
@@ -140,8 +140,8 @@ describe('parallax', function () {
 
       p.getChats('receiver2@email.com', false, false, function (err, c) {
         should.exist(c);
-        c.chats.length.should.equal(3);
-        console.log('full chat of sender/receiver2 ', c.chats)
+        c.chats.length.should.equal(4);
+        console.log('full chat of sender -> receiver2 ', c.chats)
         done();
       });
     });
@@ -163,7 +163,7 @@ describe('parallax', function () {
       p.getChats('receiver@email.com', false, false, function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(1);
-        console.log('full chat of sender/receiver ', c.chats)
+        console.log('full chat of sender -> receiver ', c.chats)
         done();
       });
     });
@@ -176,7 +176,7 @@ describe('parallax', function () {
       p2.getChats('sender@email.com', false, false, function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(1);
-        console.log('full chat of reciever/sender ', c.chats)
+        console.log('full chat of reciever -> sender ', c.chats)
         done();
       });
     });
