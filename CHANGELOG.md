@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.9
+
+* Added media option to messages
+
 ## 0.0.8
 
 * Version bump
