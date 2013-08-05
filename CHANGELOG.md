@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0
+
+* Added timestamp support
+
 ## 0.0.9
 
 * Added media option to messages

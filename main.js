@@ -59,7 +59,7 @@ var Parallax = function (user, options) {
     self.friendLevel = self.friendsLevel.sublevel(toUser + '!chats');
   };
 
-  var sendChat = function (user, chat, senderKey, options, callback) {
+  var sendChat = function (user, chat, senderKey, created, options, callback) {
     switchUser(user, self.user);
 
     self.friendList.put(self.currUser, true, function (err) {
@@ -81,7 +81,8 @@ var Parallax = function (user, options) {
         self.friendLevel.put(key, {
           message: chat,
           media: options.media || false,
-          ttl: ttl, senderKey: key
+          ttl: ttl, senderKey: key,
+          created: created
         }, function (err) {
           if (err) {
             callback(err);
@@ -93,7 +94,8 @@ var Parallax = function (user, options) {
               media: options.media || false,
               ttl: ttl,
               key: key,
-              senderKey: senderKey
+              senderKey: senderKey,
+              created: created
             });
           }
         });
@@ -118,7 +120,8 @@ var Parallax = function (user, options) {
               message: 'opened',
               media: chat.media,
               ttl: CHAT_TTL_LONG,
-              senderKey: chat.senderKey
+              senderKey: chat.senderKey,
+              created: chat.created
             }, { ttl: CHAT_TTL_LONG }, function (err) {
               if (err) {
                 callback(err);
@@ -217,17 +220,19 @@ var Parallax = function (user, options) {
     }
 
     var senderKey = setTime() + '!' + user;
+    var created = setTime();
 
     self.friendLevel.put(senderKey, {
       message: chat,
       media: options.media || false,
       ttl: ttl,
-      senderKey: senderKey
+      senderKey: senderKey,
+      created: created
     }, function (err) {
       if (err) {
         callback(err);
       } else {
-        sendChat(user, chat, senderKey, options, callback);
+        sendChat(user, chat, senderKey, created, options, callback);
       }
     });
   };
