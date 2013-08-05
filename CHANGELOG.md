@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.8
+
+* Version bump
+
 ## 0.0.7
 
 * Trigger TTL only after item has been opened
