@@ -39,15 +39,9 @@ var Parallax = function (user, options) {
       if (err) {
         callback(err);
       } else {
-        self.friendLevel.put('chats', true, function (err) {
-          if (err) {
-            callback(err);
-          } else {
-            callback(null, {
-              user: user,
-              chats: []
-            });
-          }
+        callback(null, {
+          user: user,
+          chats: []
         });
       }
     });
@@ -81,9 +75,11 @@ var Parallax = function (user, options) {
 
         self.friendLevel.put(key, {
           message: chat,
+          status: 'unread',
           media: options.media || false,
           ttl: ttl, senderKey: key,
-          created: created
+          created: created,
+          recipients: options.recipients || []
         }, function (err) {
           if (err) {
             callback(err);
@@ -96,7 +92,8 @@ var Parallax = function (user, options) {
               ttl: ttl,
               key: key,
               senderKey: senderKey,
-              created: created
+              created: created,
+              recipients: options.recipients || []
             });
           }
         });
@@ -118,11 +115,13 @@ var Parallax = function (user, options) {
             switchUser(self.currUser, user);
 
             self.friendLevel.put(key, {
-              message: 'opened',
+              message: chat.message,
+              status: 'opened',
               media: chat.media,
               ttl: CHAT_TTL_LONG,
               senderKey: chat.senderKey,
-              created: chat.created
+              created: chat.created,
+              recipients: chat.recipients
             }, { ttl: CHAT_TTL_LONG }, function (err) {
               if (err) {
                 callback(err);
@@ -276,7 +275,9 @@ var Parallax = function (user, options) {
       media: options.media || false,
       ttl: ttl,
       senderKey: senderKey,
-      created: created
+      created: created,
+      status: 'unread',
+      recipients: options.recipients || []
     }, function (err) {
       if (err) {
         callback(err);
