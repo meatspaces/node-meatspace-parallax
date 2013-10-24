@@ -69,6 +69,31 @@ Once the chat has been opened by the receiver, the TTL will start. An archive of
 
 `reverse` is an optional boolean to reverse the chat history from latest -> earliest. Defaults at earliest -> latest.
 
+## Block a user
+
+    parallax.blockUser('user@email.com', function (err, c) {
+      if (!err) {
+        console.log(c);
+      }
+    });
+
+## Unblock a user
+
+    parallax.unblockUser('user@email.com', function (err, c) {
+      if (!err) {
+        console.log(c);
+      }
+    });
+
+## Get a list of blocked users
+
+    parallax.getBlockedUsers(function (err, c) {
+      if (!err) {
+        console.log(c);
+      }
+    });
+
+
 ## Tests
 
     > make test

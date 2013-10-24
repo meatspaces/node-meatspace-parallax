@@ -29,7 +29,6 @@ describe('parallax', function () {
 
     it('should add a new friend', function (done) {
       p.getOrAddFriend('receiver@email.com', function (err, u) {
-        //console.log('new friend: ', u.user);
         should.exist(u);
         u.user.should.equal('receiver@email.com');
         u.chats.should.eql([]);
@@ -39,7 +38,6 @@ describe('parallax', function () {
 
     it('should get an existing friend', function (done) {
       p.getOrAddFriend('receiver@email.com', function (err, u) {
-        //console.log('existing friend: ', u.user);
         should.exist(u);
         u.user.should.equal('receiver@email.com');
         u.chats.should.eql([]);
@@ -177,6 +175,49 @@ describe('parallax', function () {
         should.exist(c);
         c.chats.length.should.equal(1);
         console.log('full chat of reciever -> sender ', c.chats)
+        done();
+      });
+    });
+  });
+
+  describe('.blockUser', function () {
+    it('should error on blocking a user', function (done) {
+      p.blockUser('', function (err, s) {
+        should.exist(err);
+        done();
+      });
+    });
+
+    it('should block a user', function (done) {
+      p.blockUser('receiver2@email.com', function (err, s) {
+        should.exist(s);
+        done();
+      });
+    });
+  });
+
+  describe('.getBlockedUsers', function () {
+    it('should return a list of blocked users', function (done) {
+      p.getBlockedUsers(function (err, u) {
+        should.exist(u);
+        console.log(u)
+        u.blocked.length.should.equal(1);
+        done();
+      });
+    });
+  });
+
+  describe('.unblockUser', function (done) {
+    it('should error on unblocking a user', function (done) {
+      p.unblockUser('', function (err, s) {
+        should.exist(err);
+        done();
+      });
+    });
+
+    it('should unblock a user', function (done) {
+      p.unblockUser('receiver2@email.com', function (err, s) {
+        should.exist(s);
         done();
       });
     });

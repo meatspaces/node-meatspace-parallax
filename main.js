@@ -28,6 +28,7 @@ var Parallax = function (user, options) {
   this.friendsLevel = this.db.sublevel(this.user + '!friends');
   this.db = ttl(this.db, { checkFrequency: options.frequency || 10000 });
   this.friendList = this.db.sublevel(this.user + '!friendlist');
+  this.blockList = this.db.sublevel(this.user + '!blocklist');
   this.friendLevel;
   this.currUser = this.user;
 
@@ -134,6 +135,54 @@ var Parallax = function (user, options) {
           }
         });
       }
+    });
+  };
+
+  this.blockUser = function (user, callback) {
+    if (user.length < 1) {
+      callback(new Error('Invalid user id'));
+    } else {
+
+      self.blockList.put(user, true, function (err) {
+        if (err) {
+          callback(new Error('Could not block user'));
+        } else {
+          callback(null, true);
+        }
+      });
+    }
+  };
+
+  this.unblockUser = function (user, callback) {
+    if (user.length < 1) {
+      callback(new Error('Invalid user id'));
+    } else {
+
+      self.blockList.del(user, function (err) {
+        if (err) {
+          callback(new Error('Could not unblock user'));
+        } else {
+          callback(null, true);
+        }
+      });
+    }
+  };
+
+  this.getBlockedUsers = function (callback) {
+    var blocked = [];
+
+    self.blockList.createReadStream()
+      .on('data', function (data) {
+
+      blocked.push(data);
+    }).on('error', function (err) {
+
+      callback(err);
+    }).on('end', function () {
+
+      callback(null, {
+        blocked: blocked
+      });
     });
   };
 
