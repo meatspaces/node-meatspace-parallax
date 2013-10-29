@@ -38,17 +38,18 @@ Chat using LevelDB. Currently under development.
 
 ### Add a chat message
 
-    parallax.addChat('friend@email.com', 'hola!', {
-      ttl: 10000,
+    var chat = {
       media: 'http://someimage.jpg',
       recipients: ['user1', 'user2']
-    }, function (err, c) {
-      if (!err) {
-        console.log(c);
-      }
-    });
+    };
 
-If you do not set a ttl (e.g. passing {} or { ttl: false }), it will fall back to 10 seconds.
+    chat.recipients.forEach(function (user) {
+      parallax.addChat(user, 'hola!', chat, function (err, c) {
+        if (!err) {
+          console.log(c);
+        }
+      });
+    });
 
 If you want to also store a some url or base64 string, pass it under media - otherwise, you can leave this out.
 
@@ -61,8 +62,6 @@ Recipients are optional, but if you want to keep superficial track of who you se
         console.log(c);
       }
     });
-
-Once the chat has been opened by the receiver, the TTL will start. An archive of the 'sent' message will be in the sender's chat but will delete in 3 days.
 
 ### Get all chats
 
