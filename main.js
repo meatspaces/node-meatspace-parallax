@@ -51,7 +51,7 @@ var Parallax = function (user, options) {
           senderKey: chat.senderKey,
           created: chat.created,
           recipients: chat.recipients
-        }, { ttl: CHAT_TTL_LONG }, function (err) {
+        }, function (err) {
           if (err) {
             callback(err);
           } else {
