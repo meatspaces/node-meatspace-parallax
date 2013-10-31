@@ -75,7 +75,7 @@ describe('parallax', function () {
 
   describe('.getChats', function () {
     it('should get chats', function (done) {
-      p.getChats('sender@email.com', false, false, function (err, c) {
+      p.getChats('receiver@email.com', false, false, function (err, c) {
         should.exist(c);
         c.chats.length.should.equal(1);
         done();
@@ -83,18 +83,7 @@ describe('parallax', function () {
     });
 
     it('should get chats in reverse', function (done) {
-      p.getChats('sender@email.com', false, false, function (err, c) {
-        c.chats.length.should.equal(1);
-        done();
-      });
-    });
-
-    it('should get chats to receiver from sender', function (done) {
-      p.friendsLevel = p.db.sublevel('receiver@email.com!friends');
-      p.friendList = p.db.sublevel('receiver@email.com!friendlist');
-
       p.getChats('receiver@email.com', false, false, function (err, c) {
-        should.exist(c);
         c.chats.length.should.equal(1);
         done();
       });

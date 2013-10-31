@@ -147,6 +147,8 @@ var Parallax = function (user, options) {
   this.getChats = function (user, key, reverse, callback) {
     var chats = [];
 
+    self.friendLevel = self.friendsLevel.sublevel(user);
+
     self.friendLevel.createReadStream({
       key: key,
       limit: self.limit,
