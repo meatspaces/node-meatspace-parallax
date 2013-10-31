@@ -28,7 +28,15 @@ Chat using LevelDB. Currently under development.
       }
     });
 
-## Get all friends
+### Remove a friend
+
+    parallax.removeFriend('friend@gmail.com', function (err, u) {
+      if (!err) {
+        console.log(u);
+      }
+    });
+
+### Get all friends
 
     parallax.getFriends(function (err, f) {
       if (!err) {
@@ -54,6 +62,14 @@ Chat using LevelDB. Currently under development.
 If you want to also store a some url or base64 string, pass it under media - otherwise, you can leave this out.
 
 Recipients are optional, but if you want to keep superficial track of who you sent the message to, add it here. You will still have to broadcast the message across manually.
+
+### Remove a chat message from a friend
+
+    parallax.removeChat('friend@email.com', chatKey, function (err, c) {
+      if (!err) {
+        console.log(c);
+      }
+    });
 
 ### Get chat
 

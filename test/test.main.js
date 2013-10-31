@@ -11,6 +11,8 @@ var p = new Parallax('sender@email.com', {
   frequency: 1
 });
 
+var chatKey = '';
+
 describe('parallax', function () {
   after(function () {
     child.exec('rm -rf ./test/db');
@@ -54,6 +56,7 @@ describe('parallax', function () {
       }, function (err, c) {
         console.log('chat message: ', c);
         should.exist(c);
+        chatKey = c.senderKey;
         c.message.should.eql('test message');
         c.recipients.should.eql(recipients);
         done();
@@ -98,6 +101,18 @@ describe('parallax', function () {
     });
   });
 
+  describe('.removeChat', function () {
+    it('should delete a chat', function (done) {
+      p.removeChat('receiver@email.com', chatKey, function (err, status) {
+        should.not.exist(err);
+        p.getChat('receiver@email.com', chatKey, function (err, c) {
+          should.not.exist(c);
+          done();
+        });
+      });
+    });
+  });
+
   describe('.blockUser', function () {
     it('should error on blocking a user', function (done) {
       p.blockUser('', function (err, s) {
@@ -118,7 +133,6 @@ describe('parallax', function () {
     it('should return a list of blocked users', function (done) {
       p.getBlockedUsers(function (err, u) {
         should.exist(u);
-        console.log(u)
         u.blocked.length.should.equal(1);
         done();
       });
@@ -137,6 +151,20 @@ describe('parallax', function () {
       p.unblockUser('receiver2@email.com', function (err, s) {
         should.exist(s);
         done();
+      });
+    });
+  });
+
+  describe('.removeUser', function () {
+    it('should unfriend', function (done) {
+      p.removeUser('receiver@email.com', function (err, s) {
+        should.not.exist(err);
+        should.exist(s);
+
+        p.getFriends(function (err, f) {
+          f.friends.length.should.equal(0);
+          done();
+        });
       });
     });
   });

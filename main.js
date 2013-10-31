@@ -40,7 +40,9 @@ var Parallax = function (user, options) {
     });
   };
 
-  this.getChat = function (key, user, callback) {
+  this.getChat = function (user, key, callback) {
+    self.friendLevel = self.friendsLevel.sublevel(user);
+
     self.friendLevel.get(key, function (err, chat) {
       if (err || !chat) {
         callback(new Error('Chat not found'));
@@ -60,6 +62,20 @@ var Parallax = function (user, options) {
         });
       }
     });
+  };
+
+  this.removeUser = function (user, callback) {
+    if (user.length < 1) {
+      callback(new Error('Invalid user id'));
+    } else {
+      self.friendList.del(user, function (err) {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, 'Deleted user');
+        }
+      });
+    }
   };
 
   this.blockUser = function (user, callback) {
@@ -161,9 +177,7 @@ var Parallax = function (user, options) {
     if (user.length < 1) {
       callback(new Error('Invalid user id'));
     } else {
-      if (!self.friendLevel) {
-        self.friendLevel = self.friendsLevel.sublevel(user);
-      }
+      self.friendLevel = self.friendsLevel.sublevel(user);
 
       self.friendLevel.get('chats', function (err, chats) {
         if (err || !chats) {
@@ -173,6 +187,18 @@ var Parallax = function (user, options) {
         }
       });
     }
+  };
+
+  this.removeChat = function (user, key, callback) {
+    self.friendLevel = self.friendsLevel.sublevel(user);
+
+    self.friendLevel.del(key, function (err) {
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, 'Deleted!');
+      }
+    });
   };
 
   this.addChat = function (user, chat, options, callback) {
@@ -190,6 +216,8 @@ var Parallax = function (user, options) {
       status: 'unread',
       recipients: options.recipients || []
     };
+
+    self.friendLevel = self.friendsLevel.sublevel(user);
 
     self.friendLevel.put(senderKey, chat, function (err) {
       if (err) {
