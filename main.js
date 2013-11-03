@@ -150,7 +150,7 @@ var Parallax = function (user, options) {
     self.friendLevel = self.friendsLevel.sublevel(user);
 
     self.friendLevel.createReadStream({
-      key: key,
+      start: key,
       limit: self.limit,
       reverse: reverse
 
