@@ -14,50 +14,62 @@ Chat using LevelDB. Currently under development.
 
 ## Installation
 
-    > npm install
+```sh
+$ npm install
+```
 
 ## Usage
 
-    var parallax = new Parallax('you@email.com');
+```js
+var parallax = new Parallax('you@email.com');
+```
 
 ### Add a friend
 
-    parallax.getOrAddFriend('friend@email.com', function (err, u) {
-      if (!err) {
+```js
+parallax.getOrAddFriend('friend@email.com', function (err, u) {
+    if (!err) {
         console.log(u);
-      }
-    });
+    }
+});
+```
 
 ### Remove a friend
 
-    parallax.removeFriend('friend@gmail.com', function (err, u) {
-      if (!err) {
+```js
+parallax.removeFriend('friend@gmail.com', function (err, u) {
+    if (!err) {
         console.log(u);
-      }
-    });
+    }
+});
+```
 
 ### Get all friends
 
-    parallax.getFriends(function (err, f) {
-      if (!err) {
+```js
+parallax.getFriends(function (err, f) {
+    if (!err) {
         console.log(f);
-      }
-    });
+    }
+});
+```
 
 ### Add a chat message
 
-    var chat = {
-      media: 'http://someimage.jpg',
-      recipients: ['user1', 'user2']
-    };
+```js
+var chat = {
+    media: 'http://someimage.jpg',
+    recipients: ['user1', 'user2']
+};
 
-    chat.recipients.forEach(function (user) {
-      parallax.addChat(user, 'hola!', chat, function (err, c) {
+chat.recipients.forEach(function (user) {
+    parallax.addChat(user, 'hola!', chat, function (err, c) {
         if (!err) {
-          console.log(c);
+            console.log(c);
         }
-      });
     });
+});
+```
 
 If you want to also store a some url or base64 string, pass it under media - otherwise, you can leave this out.
 
@@ -65,27 +77,33 @@ Recipients are optional, but if you want to keep superficial track of who you se
 
 ### Remove a chat message from a friend
 
-    parallax.removeChat('friend@email.com', chatKey, function (err, c) {
-      if (!err) {
+```js
+parallax.removeChat('friend@email.com', chatKey, function (err, c) {
+    if (!err) {
         console.log(c);
-      }
-    });
+    }
+});
+```
 
 ### Get chat
 
-    parallax.getChat(<key>, 'friend@email.com', function (err, c) {
-      if (!err) {
+```js
+parallax.getChat(<key>, 'friend@email.com', function (err, c) {
+    if (!err) {
         console.log(c);
-      }
-    });
+    }
+});
+```
 
 ### Get all chats
 
-    parallax.getChats('you@email.com', <key>, <reverse>, function (err, c) {
-      if (!err) {
+```js
+parallax.getChats('you@email.com', <key>, <reverse>, function (err, c) {
+    if (!err) {
         console.log(c);
-      }
-    });
+    }
+});
+```
 
 `key` is an optional point in which you want to start a chat stream from - set to false if you want it to default to the beginning.
 
@@ -93,29 +111,37 @@ Recipients are optional, but if you want to keep superficial track of who you se
 
 ## Block a user
 
-    parallax.blockUser('user@email.com', function (err, c) {
-      if (!err) {
+```js
+parallax.blockUser('user@email.com', function (err, c) {
+    if (!err) {
         console.log(c);
-      }
-    });
+    }
+});
+```
 
 ## Unblock a user
 
-    parallax.unblockUser('user@email.com', function (err, c) {
-      if (!err) {
+```js
+parallax.unblockUser('user@email.com', function (err, c) {
+    if (!err) {
         console.log(c);
-      }
-    });
+    }
+});
+```
 
 ## Get a list of blocked users
 
-    parallax.getBlockedUsers(function (err, c) {
-      if (!err) {
+```js
+parallax.getBlockedUsers(function (err, c) {
+    if (!err) {
         console.log(c);
-      }
-    });
+    }
+});
+```
 
 
 ## Tests
 
-    > make test
+```sh
+$ make test
+```
