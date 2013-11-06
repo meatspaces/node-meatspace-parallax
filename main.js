@@ -28,14 +28,20 @@ var Parallax = function (user, options) {
   var self = this;
 
   var addFriend = function (user, callback) {
-    self.friendList.put(user, true, function (err) {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, {
-          user: user,
-          chats: []
+    self.blockList.get(user, function (err, u) {
+      if (!u) {
+        self.friendList.put(user, true, function (err) {
+          if (err) {
+            callback(err);
+          } else {
+            callback(null, {
+              user: user,
+              chats: []
+            });
+          }
         });
+      } else {
+        callback(new Error('cannot add this user'));
       }
     });
   };
