@@ -83,11 +83,17 @@ var Parallax = function (user, options) {
       callback(new Error('Invalid user id'));
     } else {
 
-      self.blockList.put(user, true, function (err) {
+      self.removeUser(user, function (err, data) {
         if (err) {
-          callback(new Error('Could not block user'));
+          callback(err);
         } else {
-          callback(null, true);
+          self.blockList.put(user, true, function (err) {
+            if (err) {
+              callback(new Error('Could not block user'));
+            } else {
+              callback(null, true);
+            }
+          });
         }
       });
     }
@@ -208,24 +214,30 @@ var Parallax = function (user, options) {
       options = {};
     }
 
-    var senderKey = setTime() + '!' + user;
-    var created = setTime();
-    var chat = {
-      message: chat,
-      media: options.media || false,
-      senderKey: senderKey,
-      created: created,
-      status: 'unread',
-      recipients: options.recipients || []
-    };
+    self.blockList.get(user, function (err, u) {
+      if (!u) {
+        var senderKey = setTime() + '!' + user;
+        var created = setTime();
+        var newChat = {
+          message: chat,
+          media: options.media || false,
+          senderKey: senderKey,
+          created: created,
+          status: 'unread',
+          recipients: options.recipients || []
+        };
 
-    self.friendLevel = self.friendsLevel.sublevel(user);
+        self.friendLevel = self.friendsLevel.sublevel(user);
 
-    self.friendLevel.put(senderKey, chat, function (err) {
-      if (err) {
-        callback(err);
+        self.friendLevel.put(senderKey, newChat, function (err) {
+          if (err) {
+            callback(err);
+          } else {
+            callback(null, newChat);
+          }
+        });
       } else {
-        callback(null, chat);
+        callback(new Error('cannot send message to this user'));
       }
     });
   };

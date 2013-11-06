@@ -116,6 +116,19 @@ describe('parallax', function () {
         done();
       });
     });
+
+    it('should not send a message to a blocked user', function (done) {
+      p.blockUser('receiver2@email.com', function (err, s) {
+        p.addChat('receiver2@email.com', 'test message', {
+          media: 'http://someimage.jpg',
+          recipients: ['receiver2@email.com']
+        }, function (err, c) {
+          should.exist(err);
+          should.not.exist(c);
+          done();
+        });
+      });
+    });
   });
 
   describe('.getBlockedUsers', function () {
