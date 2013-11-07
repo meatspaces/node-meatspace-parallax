@@ -2,6 +2,7 @@
 
 var level = require('level');
 var Sublevel = require('level-sublevel');
+var concat = require('concat-stream');
 
 var Parallax = function (user, options) {
   var setTime = function () {
@@ -121,63 +122,51 @@ var Parallax = function (user, options) {
   };
 
   this.getBlockedUsers = function (callback) {
-    var blocked = [];
+    var rs = self.blockList.createReadStream();
 
-    self.blockList.createReadStream()
-      .on('data', function (data) {
-
-      blocked.push(data);
-    }).on('error', function (err) {
-
-      callback(err);
-    }).on('end', function () {
-
+    rs.pipe(concat(function (blocked) {
       callback(null, {
-        blocked: blocked
+        blocked: blocked || []
       });
+    }));
+
+    rs.on('error', function (err) {
+      callback(err);
     });
   };
 
   this.getFriends = function (callback) {
-    var friends = [];
+    var rs = self.friendList.createReadStream();
 
-    self.friendList.createReadStream()
-      .on('data', function (data) {
-
-      friends.push(data);
-    }).on('error', function (err) {
-
-      callback(err);
-    }).on('end', function () {
-
+    rs.pipe(concat(function (friends) {
       callback(null, {
-        friends: friends
+        friends: friends || []
       });
+    }));
+
+    rs.on('error', function (err) {
+      callback(err);
     });
   };
 
   this.getChats = function (user, key, reverse, callback) {
-    var chats = [];
-
     self.friendLevel = self.friendsLevel.sublevel(user);
 
-    self.friendLevel.createReadStream({
+    var rs = self.friendLevel.createReadStream({
       start: key,
       limit: self.limit,
       reverse: reverse
+    });
 
-    }).on('data', function (data) {
-
-      chats.push(data);
-    }).on('error', function (err) {
-
-      callback(err);
-    }).on('end', function () {
-
+    rs.pipe(concat(function (chats) {
       callback(null, {
         user: user,
-        chats: chats
+        chats: chats || []
       });
+    }));
+
+    rs.on('error', function (err) {
+      callback(err);
     });
   };
 
