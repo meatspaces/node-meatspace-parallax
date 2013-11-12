@@ -149,6 +149,18 @@ var Parallax = function (user, options) {
     });
   };
 
+  this.hasFriend = function (user, callback) {
+    self.friendList.get(user, function (err, friend) {
+      if (err) {
+        callback(err);
+      } else if (!friend) {
+        callback(new Error('friend not found'));
+      } else {
+        callback(null, friend);
+      }
+    });
+  };
+
   this.getChats = function (user, key, reverse, callback) {
     self.friendLevel = self.friendsLevel.sublevel(user);
 

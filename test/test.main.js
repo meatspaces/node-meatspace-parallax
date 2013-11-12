@@ -73,6 +73,22 @@ describe('parallax', function () {
     });
   });
 
+  describe('.hasFriend', function () {
+    it('should verify that friend exists', function (done) {
+      p.hasFriend('receiver@email.com', function (err, u) {
+        should.exist(u);
+        done();
+      });
+    });
+
+    it('should verify that friend does not exist', function (done) {
+      p.hasFriend('receiver2@email.com', function (err, u) {
+        should.not.exist(u);
+        done();
+      });
+    });
+  });
+
   describe('.getChats', function () {
     it('should get chats', function (done) {
       p.getChats('receiver@email.com', false, false, function (err, c) {
