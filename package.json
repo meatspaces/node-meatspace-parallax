@@ -1,6 +1,6 @@
 {
   "name": "meatspace-parallax",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Chat with LevelDB",
   "main": "main.js",
   "dependencies": {

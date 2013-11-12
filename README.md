@@ -30,7 +30,7 @@ Chat using LevelDB. Currently under development.
 
 ### Remove a friend
 
-    parallax.removeFriend('friend@gmail.com', function (err, u) {
+    parallax.removeFriend('friend@email.com', function (err, u) {
       if (!err) {
         console.log(u);
       }
@@ -41,6 +41,14 @@ Chat using LevelDB. Currently under development.
     parallax.getFriends(function (err, f) {
       if (!err) {
         console.log(f);
+      }
+    });
+
+### Verify friend exists
+
+    parallax.hasFriend('friend@email.com', function (err, u) {
+      if (!err) {
+        console.log(u);
       }
     });
 
